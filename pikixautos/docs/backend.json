@@ -1,0 +1,215 @@
+
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the PIKIX AUTOS platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "User's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "User's last name."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "User's phone number."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "Date and time the user registered.",
+          "format": "date-time"
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "Date and time of the user's last login.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "registrationDate"
+      ]
+    },
+    "Vehicle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vehicle",
+      "type": "object",
+      "description": "Represents a vehicle listed on the PIKIX AUTOS platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Vehicle entity."
+        },
+        "make": {
+          "type": "string",
+          "description": "The make of the vehicle (e.g., Toyota, Ford)."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model of the vehicle (e.g., Camry, F-150)."
+        },
+        "year": {
+          "type": "number",
+          "description": "The year the vehicle was manufactured."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the vehicle."
+        },
+        "mileage": {
+          "type": "number",
+          "description": "The mileage of the vehicle."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location where the vehicle is located."
+        },
+        "dealerId": {
+          "type": "string",
+          "description": "Reference to Dealer. (Relationship: Dealer 1:N Vehicle)"
+        }
+      },
+      "required": [
+        "id",
+        "make",
+        "model",
+        "year",
+        "price",
+        "mileage",
+        "location",
+        "dealerId"
+      ]
+    },
+    "Dealer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Dealer",
+      "type": "object",
+      "description": "Represents a dealer listing vehicles on the PIKIX AUTOS platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Dealer entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the dealership."
+        },
+        "address": {
+          "type": "string",
+          "description": "The address of the dealership."
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "The contact email address for the dealership.",
+          "format": "email"
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "The contact phone number for the dealership."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "address",
+        "contactEmail",
+        "contactPhone"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. User documents are secured using path-based ownership. Only the user (or admin) can read/write their own document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/dealers/{dealerId}",
+        "definition": {
+          "entityName": "Dealer",
+          "schema": {
+            "$ref": "#/backend/entities/Dealer"
+          },
+          "description": "Stores dealer information. Only admins can create/modify dealer profiles.",
+          "params": [
+            {
+              "name": "dealerId",
+              "description": "The unique identifier for the dealer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/dealers/{dealerId}/vehicles/{vehicleId}",
+        "definition": {
+          "entityName": "Vehicle",
+          "schema": {
+            "$ref": "#/backend/entities/Vehicle"
+          },
+          "description": "Stores vehicle listings associated with a specific dealer.  Includes denormalized 'dealerId' for authorization independence.  Only the dealer who owns the vehicle (or admin) can modify it.",
+          "params": [
+            {
+              "name": "dealerId",
+              "description": "The unique identifier for the dealer."
+            },
+            {
+              "name": "vehicleId",
+              "description": "The unique identifier for the vehicle."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "adminRole",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles. The existence of a document with the user's ID in this collection grants admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who is an admin."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the PIKIX AUTOS platform, focusing on user registration, vehicle listings, dealer information, and AI-powered recommendations. It emphasizes security, scalability, and debuggability by adhering to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are Not Filters). Authorization Independence is achieved through denormalization.  For instance, if vehicle access depended on dealer attributes, those attributes would be copied into the vehicle document. QAPs are supported via structural segregation, using separate collections for different access needs. User-owned data is nested under the `/users/{userId}` path. Collaborative data uses Membership Maps where applicable. Global roles are managed using dedicated collections like `/roles_admin/{uid}`."
+  }
+}

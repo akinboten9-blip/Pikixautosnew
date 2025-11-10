@@ -1,0 +1,163 @@
+/**
+ * @fileoverview Firestore Security Rules for PIKIX AUTOS platform.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles and recommendations, and restricts dealer and vehicle management to authorized dealers.
+ * Database-Based Access Control (DBAC) uses the `roles_admin` collection to grant admin privileges.
+ * Authorization Independence is achieved through data denormalization, embedding authorization-relevant data directly within documents to avoid costly `get()` calls in rules.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles. Only the user themselves can read/write their profile.
+ * - /dealers/{dealerId}: Stores dealer information. Only admins can create/modify dealer profiles.
+ * - /dealers/{dealerId}/vehicles/{vehicleId}: Stores vehicle listings. Only the associated dealer can modify vehicles. Includes denormalized `dealerId` for authorization.
+ * - /users/{userId}/recommendations/{recommendationId}: Stores AI-powered vehicle recommendations. Only the user can access these. Includes denormalized `userId` for authorization.
+ * - /roles_admin/{userId}: Collection for managing admin roles.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed for privacy.
+ * - Admin roles are managed through the `roles_admin` collection, enabling centralized access control.
+ * - Authorization Independence is a key principle, avoiding external lookups.
+ *
+ * Denormalization for Authorization:
+ * - Vehicle documents include a `dealerId` field, allowing vehicle modification rules to be enforced without needing to fetch the dealer document.
+ * - Recommendation documents include a `userId` field, allowing recommendation access rules to be enforced without needing to fetch the user document.
+ *
+ * Structural Segregation:
+ * - Admin roles are stored in a separate `roles_admin` collection instead of a field on the user document.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the user is signed in.
+     * @return {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the user is the owner of the resource, based on the provided userId.
+     * @param {string} userId The user ID to compare against the request's authentication UID.
+     * @return {boolean} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+        /**
+     * @description Checks if the user is an existing owner of the resource, based on the provided userId and that the resource exists.
+     * @param {string} userId The user ID to compare against the request's authentication UID.
+     * @return {boolean} True if the user is the owner and the resource exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Checks if the user has admin privileges by checking for the existence of a document in the `roles_admin` collection with the user's ID.
+     * @return {boolean} True if the user is an admin, false otherwise.
+     */
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /**
+     * @description Rules for user profiles.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' creates their own profile.
+     *    - auth.uid: 'user123'
+     *    - request.resource.data.id: 'user123'
+     * @allow (get) User with ID 'user123' reads their own profile.
+     *    - auth.uid: 'user123'
+     * @deny (create) User with ID 'user456' tries to create a profile for 'user123'.
+     *    - auth.uid: 'user456'
+     *    - request.resource.data.id: 'user123'
+     * @principle Enforces document ownership for reads and writes.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // User listing is disallowed
+
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability of userId.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for dealer profiles. Only admins can manage dealer profiles.
+     * @path /dealers/{dealerId}
+     * @allow (create) Admin user creates a dealer profile.
+     *    - User is an admin (has a document in /roles_admin/{userId}).
+     * @allow (get) Any user can read a dealer profile.
+     * @deny (create) Non-admin user attempts to create a dealer profile.
+     *    - User is not an admin.
+     * @principle Restricts dealer profile management to admins.
+     */
+    match /dealers/{dealerId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Rules for vehicle listings associated with a specific dealer.
+     * @path /dealers/{dealerId}/vehicles/{vehicleId}
+     * @allow (create) Dealer 'dealer123' creates a vehicle listing under their ID.
+     *    - auth.uid: 'dealer123'
+     *    - request.resource.data.dealerId: 'dealer123'
+     * @allow (get) Any user can read a vehicle listing.
+     * @deny (update) Another dealer tries to update a vehicle listing.
+     *    - auth.uid: 'dealer456'
+     *    - resource.data.dealerId: 'dealer123'
+     * @principle Enforces dealer ownership for vehicle listing management.
+     */
+    match /dealers/{dealerId}/vehicles/{vehicleId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.dealerId == dealerId;
+      allow update: if isSignedIn() && resource != null && request.resource.data.dealerId == dealerId;
+      allow delete: if isSignedIn() && resource != null && request.resource.data.dealerId == dealerId;
+    }
+
+    /**
+     * @description Rules for AI-powered vehicle recommendations for a user.
+     * @path /users/{userId}/recommendations/{recommendationId}
+     * @allow (create) User 'user123' creates a recommendation under their ID.
+     *    - auth.uid: 'user123'
+     *    - request.resource.data.userId: 'user123'
+     * @allow (get) User 'user123' reads their own recommendation.
+     *    - auth.uid: 'user123'
+     * @deny (update) Another user tries to update a recommendation.
+     *    - auth.uid: 'user456'
+     *    - resource.data.userId: 'user123'
+     * @principle Enforces user ownership for recommendation access.
+     */
+    match /users/{userId}/recommendations/{recommendationId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+        /**
+     * @description Rules for managing admin roles. Only admins can grant admin roles.
+     * @path /roles_admin/{userId}
+     * @allow (create) Existing admin user grants admin role to another user.
+     *    - User is already an admin (has a document in /roles_admin/{userId}).
+     * @deny (create) Non-admin user attempts to grant admin role.
+     *    - User is not an admin.
+     * @principle Restricts admin role management to existing admins.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+  }
+}

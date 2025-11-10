@@ -1,0 +1,94 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A stylish car driving on a coastal road at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1652652432930-8f00d326e72b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjYXIlMjBzdW5zZXR8ZW58MHx8fHwxNzYyNzAxNjM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car sunset"
+    },
+    {
+      "id": "sedan-1",
+      "description": "A modern white sedan.",
+      "imageUrl": "https://images.unsplash.com/photo-1760161339236-f5509e7cccf0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx3aGl0ZSUyMHNlZGFufGVufDB8fHx8MTc2MjcxMDM4OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "white sedan"
+    },
+    {
+      "id": "sedan-2",
+      "description": "Interior of a modern sedan.",
+      "imageUrl": "https://images.unsplash.com/photo-1471174617910-3e9c04f58ff5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjYXIlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjI2NDQxMjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car interior"
+    },
+    {
+      "id": "sedan-3",
+      "description": "Dashboard of a modern sedan.",
+      "imageUrl": "https://images.unsplash.com/photo-1533630217389-3a5e4dff5683?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXIlMjBkYXNoYm9hcmR8ZW58MHx8fHwxNzYyNzE3OTg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car dashboard"
+    },
+    {
+      "id": "suv-1",
+      "description": "A black SUV on a mountain road.",
+      "imageUrl": "https://images.unsplash.com/photo-1645791608315-5f3aae17efdb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxibGFjayUyMHN1dnxlbnwwfHx8fDE3NjI2ODQ1NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "black suv"
+    },
+    {
+      "id": "suv-2",
+      "description": "Spacious interior of an SUV.",
+      "imageUrl": "https://images.unsplash.com/photo-1729976262534-9668ceb11c46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c3V2JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYyNzI0NjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suv interior"
+    },
+    {
+      "id": "suv-3",
+      "description": "Third row seating in an SUV.",
+      "imageUrl": "https://images.unsplash.com/photo-1657485446580-80dcf645853a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdXYlMjBzZWF0c3xlbnwwfHx8fDE3NjI3MjQ2NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suv seats"
+    },
+    {
+      "id": "truck-1",
+      "description": "A red pickup truck in a rural setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1754409218615-f541d5cc6021?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxyZWQlMjB0cnVja3xlbnwwfHx8fDE3NjI3MDM5MjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "red truck"
+    },
+    {
+      "id": "truck-2",
+      "description": "The truck bed of a pickup.",
+      "imageUrl": "https://images.unsplash.com/photo-1758218921066-a9d911269bb1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0cnVjayUyMGJlZHxlbnwwfHx8fDE3NjI3MjQ2NjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "truck bed"
+    },
+    {
+      "id": "truck-3",
+      "description": "Tough interior of a pickup truck.",
+      "imageUrl": "https://images.unsplash.com/photo-1631433048545-6c18c7fc9bde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cnVjayUyMGludGVyaW9yfGVufDB8fHx8MTc2MjY5NDkyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "truck interior"
+    },
+    {
+      "id": "luxury-1",
+      "description": "A sleek silver luxury car.",
+      "imageUrl": "https://images.unsplash.com/photo-1750097298260-2559b9f44be0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2lsdmVyJTIwY2FyfGVufDB8fHx8MTc2MjcwMTEzMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "silver car"
+    },
+    {
+      "id": "luxury-2",
+      "description": "Plush leather seats of a luxury car.",
+      "imageUrl": "https://images.unsplash.com/photo-1612639109985-34aecb877765?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsZWF0aGVyJTIwc2VhdHN8ZW58MHx8fHwxNzYyNzExMDkwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather seats"
+    },
+    {
+      "id": "luxury-3",
+      "description": "High-tech dashboard of a luxury car.",
+      "imageUrl": "https://images.unsplash.com/photo-1547731269-e4073e054f12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsdXh1cnklMjBkYXNoYm9hcmR8ZW58MHx8fHwxNzYyNzI0NjY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury dashboard"
+    },
+    {
+      "id": "convertible-1",
+      "description": "A blue convertible with the top down.",
+      "imageUrl": "https://images.unsplash.com/photo-1659890063603-708fd0473544?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxibHVlJTIwY29udmVydGlibGV8ZW58MHx8fHwxNzYyNjE3MzQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blue convertible"
+    },
+    {
+      "id": "electric-1",
+      "description": "A futuristic electric vehicle charging.",
+      "imageUrl": "https://images.unsplash.com/photo-1639302610362-4c86747e8680?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxlbGVjdHJpYyUyMGNhcnxlbnwwfHx8fDE3NjI2NjMxOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electric car"
+    }
+  ]
+}
