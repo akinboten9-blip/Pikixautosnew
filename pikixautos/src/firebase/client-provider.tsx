@@ -1,51 +1,55 @@
 'use client';
 
-import React, { useMemo, type ReactNode } from 'react';
+import React, { useMemo, type ReactNode, useState, useEffect } from 'react';
 import { FirebaseProvider } from '@/firebase/provider';
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
-// This function is defined here to ensure it's only part of the client bundle.
-function initializeFirebase() {
-  // The getApps().length check prevents re-initialization on hot reloads.
-  if (!getApps().length) {
-    const firebaseApp = initializeApp(firebaseConfig);
-    return getSdks(firebaseApp);
-  } else {
-    // In a server environment or after a hot-reload, we use the existing app instance
-    // but ensure we pass the config to it. This is the key fix.
-    const app = getApp();
-    initializeApp(firebaseConfig, app.name);
-    return getSdks(app);
-  }
+interface FirebaseServices {
+  firebaseApp: FirebaseApp;
+  auth: Auth;
+  firestore: Firestore;
 }
-
-function getSdks(firebaseApp: FirebaseApp) {
-  return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp),
-  };
-}
-
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
 }
 
 export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
-  const firebaseServices = useMemo(() => {
-    // Initialize Firebase on the client side, once per component mount.
-    return initializeFirebase();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  const [services, setServices] = useState<FirebaseServices | null>(null);
+
+  useEffect(() => {
+    // This function is defined here to ensure it's only part of the client bundle.
+    function initializeFirebase(): FirebaseServices {
+      if (getApps().length === 0) {
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const firestore = getFirestore(firebaseApp);
+        return { firebaseApp, auth, firestore };
+      } else {
+        const app = getApp();
+        const auth = getAuth(app);
+        const firestore = getFirestore(app);
+        return { firebaseApp: app, auth, firestore };
+      }
+    }
+
+    setServices(initializeFirebase());
+  }, []); // Empty dependency array ensures this runs only once on mount, on the client.
+
+  if (!services) {
+    // Render nothing or a loading spinner until Firebase is initialized on the client.
+    // This prevents any child components from trying to use Firebase before it's ready.
+    return null; 
+  }
 
   return (
     <FirebaseProvider
-      firebaseApp={firebaseServices.firebaseApp}
-      auth={firebaseServices.auth}
-      firestore={firebaseServices.firestore}
+      firebaseApp={services.firebaseApp}
+      auth={services.auth}
+      firestore={services.firestore}
     >
       {children}
     </FirebaseProvider>
